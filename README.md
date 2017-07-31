@@ -24,7 +24,13 @@ Or download js/dynamicrows.min.js and include the script on your page like shown
 
 ### Usage
 
-HTML:
+Include script:
+
+```html
+<script src="dynamicrows.min.js"></script>
+```
+
+Markup (example):
 
 ```html
 <table data-dynamicrows>
@@ -50,7 +56,7 @@ HTML:
 </table>
 ```
 
-JavaScript:
+Initialize:
 
 ```javacript
 $(function() {

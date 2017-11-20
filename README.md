@@ -68,24 +68,28 @@ $(function() {
 
 ### Options
 
-Option          | Default          | Description
-----------------|------------------|-------------------------------------------
-`row`           | `tr`             | row selector
-`rows`          | `tbody`          | rows-container selector
-`minrows`       | `1`              | minimum of rows
-`copyRow`       | `null`           | row selector for template-row
-`copyValues`    | `false`          | if true input-values are copied
-`increment`     | `null`           | selector for placing row numbering
-`handle_add`    | `[data-add]`     | selector for adding new row
-`handle_remove` | `[data-remove]`  | selector for removing row
-`handle_move`   | `[data-move]`    | selector for moving row
-`index_start`   | `0`              | starting index for input-arrays
-`beforeAdd`     | `null`           | callback function
-`beforeRemove`  | `null`           | callback function
-`beforeMove`    | `null`           | callback function
-`afterAdd`      | `null`           | callback function
-`afterRemove`   | `null`           | callback function
-`afterMove`     | `null`           | callback function
+Option                  | Default          | Description
+------------------------|------------------|-----------------------------------
+`row`                   | `tr`             | row selector
+`rows`                  | `tbody`          | rows-container selector
+`minrows`               | `1`              | minimum of rows
+`copyRow`               | `null`           | row selector for template-row
+`copyValues`            | `false`          | if true input-values are copied
+`increment`             | `null`           | selector for placing row numbering
+`handle_add`            | `[data-add]`     | selector for adding new row
+`handle_remove`         | `[data-remove]`  | selector for removing row
+`handle_move`           | `[data-move]`    | selector for moving row
+`index_start`           | `0`              | starting index for input-arrays
+`beforeAdd`             | `null`           | callback function
+`beforeRemove`          | `null`           | callback function
+`beforeFormUpdateNames` | `null`           | callback function
+`beforeAll`             | `null`           | callback function
+`beforeMove`            | `null`           | callback function
+`afterAdd`              | `null`           | callback function
+`afterRemove`           | `null`           | callback function
+`afterMove`             | `null`           | callback function
+`afterFormUpdateNames`  | `null`           | callback function
+`afterAll`              | `null`           | callback function
 
 ***
 

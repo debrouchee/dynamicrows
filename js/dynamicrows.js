@@ -1,7 +1,7 @@
 /*
-DynamicRows 1.3.4
+DynamicRows 1.3.5
 Copyright (c) 2013-2017 Dennis Dohle
-Last changes: 29.05.2017
+Last changes: 20.11.2017
 */
 (function($){
 
@@ -11,22 +11,26 @@ Last changes: 29.05.2017
 
 		// Einstellungen
 		var settings = $.extend({
-			row           : 'tr', /* Selector einer Zeile */
-			rows          : 'tbody', /* Selector aller Zeilen */
-			minrows       : 1, /* Sichtbare Mindestzeilen */
-			copyRow       : null, /* Immer bestimmte Zeile kopieren; z.B. 2 } */
-			copyValues    : false, /* Beim Klonen Werte übernehmen */
-			increment     : null, /* Selector für Auto-Nummerierung der Zeilen */
-			handle_add    : '[data-add]:not(.disabled)', /* Selector für Option "neue Zeile" */
-			handle_remove : '[data-remove]:not(.disabled)', /* Selector für Option "Zeile löschen" */
-			handle_move   : '[data-move]:not(.disabled)', /* Selector für Option "Zeile verschieben" */
-			index_start   : 0, /* Start-Index der Formularlemente */
-			beforeAdd     : null, /* Event vor dem Einfügen einer neuen Zeile */
-			beforeRemove  : null, /* Event vor dem Löschen einer Zeile */
-			beforeMove    : null, /* Event vor dem Verschieben einer Zeile */
-			afterAdd      : null, /* Event nach dem Einfügen einer neuen Zeile */
-			afterRemove   : null, /* Event nach dem Löschen einer Zeile */
-			afterMove     : null /* Event nach dem Verschieben einer Zeile */
+			row                   : 'tr', /* Selector einer Zeile */
+			rows                  : 'tbody', /* Selector aller Zeilen */
+			minrows               : 1, /* Sichtbare Mindestzeilen */
+			copyRow               : null, /* Immer bestimmte Zeile kopieren; z.B. 2 } */
+			copyValues            : false, /* Beim Klonen Werte übernehmen */
+			increment             : null, /* Selector für Auto-Nummerierung der Zeilen */
+			handle_add            : '[data-add]:not(.disabled)', /* Selector für Option "neue Zeile" */
+			handle_remove         : '[data-remove]:not(.disabled)', /* Selector für Option "Zeile löschen" */
+			handle_move           : '[data-move]:not(.disabled)', /* Selector für Option "Zeile verschieben" */
+			index_start           : 0, /* Start-Index der Formularlemente */
+			beforeAdd             : null, /* Event vor dem Einfügen einer neuen Zeile */
+			beforeRemove          : null, /* Event vor dem Löschen einer Zeile */
+			beforeMove            : null, /* Event vor dem Verschieben einer Zeile */
+			beforeFormUpdateNames : null, /* Event vor dem Ändern der Formularelementnamen einer Zeile */
+			beforeAll             : null, /* Event vor der Änderung einer Zeile */
+			afterAdd              : null, /* Event nach dem Einfügen einer neuen Zeile */
+			afterRemove           : null, /* Event nach dem Löschen einer Zeile */
+			afterMove             : null, /* Event nach dem Verschieben einer Zeile */
+			afterFormUpdateNames  : null, /* Event nach dem Ändern der Formularelementnamen einer Zeile */
+			afterAll              : null /* Event nach der Änderung einer Zeile */
 		}, options);
 
 		// Daten-Attribute berücksichtigen
@@ -70,10 +74,12 @@ Last changes: 29.05.2017
 				handle: settings.handle_move,
 				start: function(event, ui){
 					if (settings.beforeMove) { settings.beforeMove(ui.item); }
+					if (settings.beforeAll) { settings.beforeAll(ui.item); }
 				},
 				update: function(event, ui){
 					updateFormNames();
 					if (settings.afterMove) { settings.afterMove(ui.item); }
+					if (settings.afterAll) { settings.afterAll(ui.item); }
 				}
 			});
 		}
@@ -83,6 +89,10 @@ Last changes: 29.05.2017
 			var row = $(handle).closest(settings.row);
 			if (settings.beforeAdd) {
 				var result = settings.beforeAdd(row);
+				if (result === false) return false;
+			}
+			if (settings.beforeAll) {
+				var result = settings.beforeAll(row);
 				if (result === false) return false;
 			}
 			if (settings.copyRow) {
@@ -99,6 +109,7 @@ Last changes: 29.05.2017
 			row_new.insertAfter(row);
 			updateFormNames();
 			if (settings.afterAdd) { settings.afterAdd(row_new); }
+			if (settings.afterAll) { settings.afterAll(row_new); }
 		}
 
 		// Zeile löschen
@@ -106,6 +117,10 @@ Last changes: 29.05.2017
 			var row = $(handle).closest(settings.row);
 			if (settings.beforeRemove) {
 				var result = settings.beforeRemove(row);
+				if (result === false) return false;
+			}
+			if (settings.beforeAll) {
+				var result = settings.beforeAll(row);
 				if (result === false) return false;
 			}
 			var rows = $(row).closest(settings.rows);
@@ -119,6 +134,7 @@ Last changes: 29.05.2017
 				cleanFormElems(row);
 			}
 			if (settings.afterRemove) { settings.afterRemove(row); }
+			if (settings.afterAll) { settings.afterAll(row); }
 		}
 
 		// Array-Indexe der Formularelemente anpassen
@@ -127,8 +143,12 @@ Last changes: 29.05.2017
 			var name_regex = /(.*?)(\[\d+?\])(?!\[\d+?\])(.*)/g;
 			var current_index = settings.index_start - 1;
 			$('> ' + settings.row, settings.rows).each(function(){
+				var $row = $(this);
+				if (settings.beforeFormUpdateNames) {
+					settings.beforeFormUpdateNames( $row );
+				}
 				current_index++;
-				$(':input', this).each(function(){
+				$row.find(':input').each(function(){
 					$(this).attr('name', function(i, name) {
 						if (name === undefined) return true;
 						return name.replace(name_regex, function replacer(match, p1, p2, p3, offset, string){
@@ -137,28 +157,10 @@ Last changes: 29.05.2017
 					}).removeAttr('id');
 				});
 				if (settings.increment) {
-					$(settings.increment, this).html( current_index + 1 );
+					$row.find(settings.increment).html( current_index + 1 );
 				}
-			});
-		}
-
-		// Array-Indexe der Formularelemente anpassen
-		function updateFormNamesOld() {
-			var current_index = settings.index_start - 1;
-			$('> ' + settings.row, settings.rows).each(function(){
-				current_index++;
-				$(':input', this).each(function(){
-					var old_name = $(this).attr('name');
-					if (!old_name) return;
-					var old_name_arr = old_name.split('[');
-					if (old_name_arr.length > 1) {
-						var old_index = old_name_arr[ settings.row_index_pos ].replace(']', '');
-						var new_name = old_name.replace(old_name_arr[ settings.row_index_pos ] + '[' + old_index + ']', old_name_arr[ settings.row_index_pos ] + '[' + current_index + ']');
-						$(this).attr('name', new_name).removeAttr('id');
-					}
-				});
-				if (settings.increment) {
-					$(settings.increment, this).html( current_index + 1);
+				if (settings.afterFormUpdateNames) {
+					settings.afterFormUpdateNames( $row );
 				}
 			});
 		}

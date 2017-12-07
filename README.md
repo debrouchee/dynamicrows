@@ -12,10 +12,16 @@ jQuery-plugin for add/remove rows by cloning existing row / renaming form-elemen
 
 ### Installation
 
-Bower:
+npm:
 
 ```
-bower install debrouchee/dynamicrows --save-dev
+npm install dynamicrows --save
+```
+
+Bower (deprecated):
+
+```
+bower install debrouchee/dynamicrows --save
 ```
 
 Or download js/dynamicrows.min.js and include the script on your page like shown below.

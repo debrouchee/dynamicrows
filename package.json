@@ -1,0 +1,22 @@
+{
+  "name": "dynamicrows",
+  "version": "1.0.0",
+  "description": "jQuery-plugin for add/remove rows by cloning existing row / renaming form-elements (arrays)",
+  "main": "js/dynamicrows.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "jquery": ">=1.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/debrouchee/dynamicrows.git"
+  },
+  "author": "Dennis Dohle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/debrouchee/dynamicrows/issues"
+  },
+  "homepage": "https://github.com/debrouchee/dynamicrows#readme"
+}

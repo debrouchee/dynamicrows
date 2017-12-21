@@ -5,8 +5,8 @@ jQuery-plugin for add/remove rows by cloning existing row / renaming form-elemen
 
 ### Requirements
 
-* jQuery >=1.6
-* jQuery-UI (sortable) >= 1.10.1 (if move-action used)
+* jQuery >=1.8
+* if move-action used: sortablejs (recommended) or jQuery UI
 
 ***
 

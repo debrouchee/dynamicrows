@@ -1,7 +1,7 @@
 /*
-DynamicRows 1.3.5
+DynamicRows 1.3.6
 Copyright (c) 2013-2017 Dennis Dohle
-Last changes: 20.11.2017
+Last changes: 21.12.2017
 */
 (function($){
 
@@ -64,24 +64,55 @@ Last changes: 20.11.2017
 		}
 
 		// Custom-Event nach Verschiebe-Aktion
-		if (settings.handle_move && $(settings.handle_move, settings.rows).length > 0 && jQuery.fn.sortable) {
-			var items = [];
-			$(settings.handle_move, settings.rows).each(function(){
-				items.push( $(this).closest(settings.row) );
-			});
-			$(settings.rows, this).sortable({
-				items: items,
-				handle: settings.handle_move,
-				start: function(event, ui){
-					if (settings.beforeMove) { settings.beforeMove(ui.item); }
-					if (settings.beforeAll) { settings.beforeAll(ui.item); }
-				},
-				update: function(event, ui){
-					updateFormNames();
-					if (settings.afterMove) { settings.afterMove(ui.item); }
-					if (settings.afterAll) { settings.afterAll(ui.item); }
-				}
-			});
+		if (settings.handle_move && $(settings.handle_move, settings.rows).length > 0) {
+			// Plugin sortable.js (recommended)
+			if (Sortable) {
+				var el = $(settings.rows, this)[0];
+
+				$(settings.handle_move, settings.rows).each(function() {
+					var $row = $(this).closest(settings.row);
+					$row.addClass('dynamicrows-row');
+					$row.find(settings.handle_move).addClass('dynamicrows-move');
+				});
+
+				var sortable = new Sortable(el, {
+					handle: '.dynamicrows-move',
+					draggable: '.dynamicrows-row',
+					onStart: function(event) {
+						if (settings.beforeMove) { settings.beforeMove(event.item); }
+						if (settings.beforeAll) { settings.beforeAll(event.item); }
+					},
+					onUpdate: function(event){
+						updateFormNames();
+						if (settings.afterMove) { settings.afterMove(event.item); }
+						if (settings.afterAll) { settings.afterAll(event.item); }
+					}
+				});
+			}
+			// Plugin jquery-ui
+			else if (jQuery.fn.sortable) {
+				var items = [];
+				$(settings.handle_move, settings.rows).each(function(){
+					items.push( $(this).closest(settings.row) );
+				});
+
+				$(settings.rows, this).sortable({
+					items: items,
+					handle: settings.handle_move,
+					start: function(event, ui){
+						if (settings.beforeMove) { settings.beforeMove(ui.item); }
+						if (settings.beforeAll) { settings.beforeAll(ui.item); }
+					},
+					update: function(event, ui){
+						updateFormNames();
+						if (settings.afterMove) { settings.afterMove(ui.item); }
+						if (settings.afterAll) { settings.afterAll(ui.item); }
+					}
+				});
+			}
+			else {
+				alert('No sortable-plugin found! Please load sortablejs or jquery-ui (with sortable widget).');
+			}
 		}
 
 		// Neue Zeile einfügen

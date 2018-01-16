@@ -1,5 +1,5 @@
 # dynamicrows
-jQuery-plugin for add/remove rows by cloning existing row / renaming form-elements (arrays)
+jQuery-plugin for add/remove rows by cloning existing row / renaming form-elements (arrays).
 
 ***
 

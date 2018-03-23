@@ -1,7 +1,7 @@
 /*
-DynamicRows 1.3.6
-Copyright (c) 2013-2017 Dennis Dohle
-Last changes: 21.12.2017
+DynamicRows 1.3.7
+Copyright (c) 2013-2018 Dennis Dohle
+Last changes: 23.03.2018
 */
 (function($){
 
@@ -66,7 +66,7 @@ Last changes: 21.12.2017
 		// Custom-Event nach Verschiebe-Aktion
 		if (settings.handle_move && $(settings.handle_move, settings.rows).length > 0) {
 			// Plugin sortable.js (recommended)
-			if (Sortable) {
+			if (typeof Sortable != 'undefined') {
 				var el = $(settings.rows, this)[0];
 
 				$(settings.handle_move, settings.rows).each(function() {

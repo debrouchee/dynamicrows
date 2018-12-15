@@ -5,7 +5,7 @@ jQuery-plugin for add/remove rows by cloning existing row / renaming form-elemen
 
 ### Requirements
 
-* jQuery >=1.8
+* jQuery >=2.0
 * if move-action used: sortablejs (recommended) or jQuery UI
 
 ***
@@ -102,6 +102,8 @@ Option                  | Default          | Description
 `afterMove`             | `null`           | callback function
 `afterFormUpdateNames`  | `null`           | callback function
 `afterAll`              | `null`           | callback function
+`animation`             | `null`           | jQuery animation method (fade)
+`animation_speed`       | `null`           | animation speed in milliseconds
 
 ***
 

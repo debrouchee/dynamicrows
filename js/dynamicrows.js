@@ -1,7 +1,7 @@
 /*
-DynamicRows 1.3.7
+DynamicRows 1.3.8
 Copyright (c) 2013-2018 Dennis Dohle
-Last changes: 23.03.2018
+Last changes: 15.12.2018
 */
 (function($){
 
@@ -30,7 +30,9 @@ Last changes: 23.03.2018
 			afterRemove           : null, /* Event nach dem Löschen einer Zeile */
 			afterMove             : null, /* Event nach dem Verschieben einer Zeile */
 			afterFormUpdateNames  : null, /* Event nach dem Ändern der Formularelementnamen einer Zeile */
-			afterAll              : null /* Event nach der Änderung einer Zeile */
+			afterAll              : null, /* Event nach der Änderung einer Zeile */
+			animation            : false, /* Animation für add und remove (fade) */
+			animation_speed      : 300  /* Animation-Geschwindigkeit für add und remove (fade) */
 		}, options);
 
 		// Daten-Attribute berücksichtigen
@@ -45,7 +47,7 @@ Last changes: 23.03.2018
 		}
 
 		// Zeilen-Container als Objekt definieren
-		settings.rows = $(settings.rows, this);
+		var $rows = settings.rows ? $(settings.rows, this) : $obj;
 
 		// Custom-Event nach neuer Zeile
 		if (settings.handle_add) {
@@ -92,19 +94,21 @@ Last changes: 23.03.2018
 			// Plugin jquery-ui
 			else if (jQuery.fn.sortable) {
 				var items = [];
-				$(settings.handle_move, settings.rows).each(function(){
+				$rows.find( settings.handle_move ).each(function(){
 					items.push( $(this).closest(settings.row) );
 				});
-
-				$(settings.rows, this).sortable({
+				$rows.sortable({
 					items: items,
 					handle: settings.handle_move,
 					start: function(event, ui){
 						if (settings.beforeMove) { settings.beforeMove(ui.item); }
 						if (settings.beforeAll) { settings.beforeAll(ui.item); }
 					},
+
 					update: function(event, ui){
-						updateFormNames();
+						if (!settings.prevent_renaming) {
+							updateFormNames();
+						}
 						if (settings.afterMove) { settings.afterMove(ui.item); }
 						if (settings.afterAll) { settings.afterAll(ui.item); }
 					}
@@ -117,55 +121,96 @@ Last changes: 23.03.2018
 
 		// Neue Zeile einfügen
 		function addRow(handle) {
-			var row = $(handle).closest(settings.row);
+			var $row = $(handle).closest(settings.row);
+
+			// autocompleteInput Plugin berücksichtigen
+			if ($.fn.autocompleteInput) {
+				$rows.find('input[data-autocomplete-input]').autocompleteInput('destroy');
+			}
+
 			if (settings.beforeAdd) {
-				var result = settings.beforeAdd(row);
+				var result = settings.beforeAdd($row);
 				if (result === false) return false;
 			}
-			if (settings.beforeAll) {
-				var result = settings.beforeAll(row);
-				if (result === false) return false;
-			}
+
 			if (settings.copyRow) {
-				var row_new = $(handle).closest(settings.rows).find(settings.row + ':nth-child(' + settings.copyRow + ')').clone(true);
-			} else {
-				var row_new = row.clone(true);
+				var $row_new = $(handle).closest(settings.rows).children(settings.row + ':nth-child(' + settings.copyRow + ')').clone(true);
 			}
-			if (row_new.length == 0) { return false; }
-			cleanFormElems(row_new, true);
+			else {
+				var $row_new = $row.clone(true);
+			}
+
+			if (!$row_new.length) { return false; }
+
+			cleanFormElems($row_new, true);
+
 			if (settings.copyValues) {
-				copyFormElemsValues(row, row_new);
+				copyFormElemsValues($row, $row_new);
 			}
-			if ($.fn.datepick) { $('input.datepicker', row_new).datepick('destroy').datepick(); }
-			row_new.insertAfter(row);
-			updateFormNames();
-			if (settings.afterAdd) { settings.afterAdd(row_new); }
-			if (settings.afterAll) { settings.afterAll(row_new); }
+
+			// datepick Plugin berücksichtigen
+			if ($.fn.datepick) {
+				$row_new.find('input.datepicker').datepick('destroy');
+			}
+
+			if (settings.animation == 'fade') {
+				$row_new.hide().insertAfter($row);
+				$row_new.fadeIn(settings.animation_speed);
+			}
+			else {
+				$row_new.insertAfter($row);
+			}
+
+			if (!settings.prevent_renaming) {
+				updateFormNames();
+			}
+
+			// datepick Plugin berücksichtigen
+			if ($.fn.datepick) {
+				$row_new.find('input.datepicker').datepick();
+			}
+
+			// autocompleteInput Plugin berücksichtigen
+			if ($.fn.autocompleteInput) {
+				$rows.find('input[data-autocomplete-input]').autocompleteInput();
+			}
+
+			if (settings.afterAdd) { settings.afterAdd($row_new); }
+			if (settings.afterAll) { settings.afterAll($row_new); }
 		}
 
 		// Zeile löschen
 		function removeRow(handle) {
-			var row = $(handle).closest(settings.row);
+			var $row = $(handle).closest(settings.row);
 			if (settings.beforeRemove) {
-				var result = settings.beforeRemove(row);
+				var result = settings.beforeRemove($row);
 				if (result === false) return false;
 			}
-			if (settings.beforeAll) {
-				var result = settings.beforeAll(row);
-				if (result === false) return false;
-			}
-			var rows = $(row).closest(settings.rows);
-			var rows_count = $('> ' + settings.row, rows).length;
+			var rows_count = $rows.children(settings.row).length;
 			if (rows_count > settings.minrows) {
-				row.remove();
-				updateFormNames();
-				row = null;
+				if (settings.animation == 'fade') {
+					$row.fadeOut(settings.animation_speed, function() {
+						$(this).remove();
+					});
+				}
+				else {
+					$row.remove();
+				}
+				if (!settings.prevent_renaming) {
+					updateFormNames();
+				}
+				$row = null;
 			}
 			else {
-				cleanFormElems(row);
+				cleanFormElems($row);
+
+				// autocompleteInput Plugin berücksichtigen
+				if ($.fn.autocompleteInput) {
+					$row.find('input[data-autocomplete-input]').autocompleteInput('deselect');
+				}
 			}
-			if (settings.afterRemove) { settings.afterRemove(row); }
-			if (settings.afterAll) { settings.afterAll(row); }
+			if (settings.afterRemove) { settings.afterRemove($row); }
+			if (settings.afterAll) { settings.afterAll($row); }
 		}
 
 		// Array-Indexe der Formularelemente anpassen
@@ -197,29 +242,29 @@ Last changes: 23.03.2018
 		}
 
 		// Formular-Werte der kopierten Zeile übernehmen
-		function copyFormElemsValues(row, row_new){
+		function copyFormElemsValues($row, $row_new){
 			var root = this;
-			row.find(':text, textarea, select:not(multiple)').each(function() {
+			$row.find(':text, textarea, select:not(multiple)').each(function() {
 				var $el = $(this);
 				var name = $el.attr('name');
-				row_new.find('[name="' + name + '"]').val( $el.val() );
+				$row_new.find('[name="' + name + '"]').val( $el.val() );
 			});
-			row.find(':checkbox, :radio').each(function() {
+			$row.find(':checkbox, :radio').each(function() {
 				var $el = $(this);
 				var name = $el.attr('name');
-				row_new.find('[name="' + name + '"]').prop('checked', $el.prop('checked') );
+				$row_new.find('[name="' + name + '"]').prop('checked', $el.prop('checked') );
 			});
 		}
 
 		// Nach den Klonen einer Zeile Formular-Werte zurücksetzen
-		function cleanFormElems(row, copy){
+		function cleanFormElems($row, copy){
 			var root = this;
-			$('.disabled', row).removeClass('disabled');
-			$('input[type="hidden"]', row).val('');
+			$('.disabled', $row).removeClass('disabled');
+			$('input[type="hidden"]', $row).val('');
 			if (!copy || settings.copyValues === false) {
-				$(':text, textarea', row).val('');
-				$(':checkbox, :radio', row).prop('checked', false);
-				$('select option', row).removeAttr('selected').find(':first').prop('selected', true);
+				$(':text, textarea', $row).val('');
+				$(':checkbox, :radio', $row).prop('checked', false);
+				$('select', $row).children('option:selected').prop('selected', false);
 			}
 		}
 

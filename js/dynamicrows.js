@@ -1,7 +1,7 @@
 /*
-DynamicRows 1.3.8
-Copyright (c) 2013-2018 Dennis Dohle
-Last changes: 15.12.2018
+DynamicRows 1.3.9
+Copyright (c) 2013-2019 Dennis Dohle
+Last changes: 12.01.2019
 */
 (function($){
 
@@ -66,12 +66,12 @@ Last changes: 15.12.2018
 		}
 
 		// Custom-Event nach Verschiebe-Aktion
-		if (settings.handle_move && $(settings.handle_move, settings.rows).length > 0) {
+		if (settings.handle_move && $rows.find(settings.handle_move).length > 0) {
 			// Plugin sortable.js (recommended)
 			if (typeof Sortable != 'undefined') {
-				var el = $(settings.rows, this)[0];
+				var el = $rows[0];
 
-				$(settings.handle_move, settings.rows).each(function() {
+				$rows.find(settings.handle_move).each(function() {
 					var $row = $(this).closest(settings.row);
 					$row.addClass('dynamicrows-row');
 					$row.find(settings.handle_move).addClass('dynamicrows-move');
@@ -218,7 +218,7 @@ Last changes: 15.12.2018
 			// Adding a ? on a quantifier (?, * or +) makes it non-greedy
 			var name_regex = /(.*?)(\[\d+?\])(?!\[\d+?\])(.*)/g;
 			var current_index = settings.index_start - 1;
-			$('> ' + settings.row, settings.rows).each(function(){
+			$rows.find(settings.row).each(function() {
 				var $row = $(this);
 				if (settings.beforeFormUpdateNames) {
 					settings.beforeFormUpdateNames( $row );

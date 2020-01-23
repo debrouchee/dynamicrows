@@ -273,7 +273,7 @@ Last changes: 12.01.2019
 			$inputs.each(function() {
 				var $input = $(this);
 				var type = $input.prop('type');
-				switch (prop) {
+				switch (type) {
 					case 'color':
 					case 'date':
 					case 'datetime-local':

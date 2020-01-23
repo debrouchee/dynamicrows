@@ -259,13 +259,47 @@ Last changes: 12.01.2019
 		// Nach den Klonen einer Zeile Formular-Werte zurücksetzen
 		function cleanFormElems($row, copy){
 			var root = this;
+
 			$('.disabled', $row).removeClass('disabled');
-			$('input[type="hidden"]', $row).val('');
-			if (!copy || settings.copyValues === false) {
-				$(':text, textarea', $row).val('');
-				$(':checkbox, :radio', $row).prop('checked', false);
-				$('select', $row).children('option:selected').prop('selected', false);
-			}
+
+			var $inputs = $row.find(':input');
+			if (!$inputs.length) return;
+
+			$inputs.filter('input[type="hidden"]').val('');
+
+			if (copy) return;
+			if (settings.copyValues !== false) return;
+
+			$inputs.each(function() {
+				var $input = $(this);
+				var type = $input.prop('type');
+				switch (prop) {
+					case 'color':
+					case 'date':
+					case 'datetime-local':
+					case 'email':
+					case 'month':
+					case 'number':
+					case 'password':
+					case 'range':
+					case 'search':
+					case 'select-one':
+					case 'tel':
+					case 'text':
+					case 'time':
+					case 'url':
+					case 'week':
+						$input.val('');
+						break;
+					case 'select-multiple':
+						$input.find('option').prop('selected', false);
+						break;
+					case 'checkbox':
+					case 'radio':
+						$input.prop('checked', false);
+						break;
+				}
+			});
 		}
 
 	};

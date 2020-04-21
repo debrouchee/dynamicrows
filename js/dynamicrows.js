@@ -1,7 +1,7 @@
 /*
-DynamicRows 1.3.9
-Copyright (c) 2013-2019 Dennis Dohle
-Last changes: 12.01.2019
+DynamicRows 1.3.13
+Copyright (c) 2013-2020 Dennis Dohle
+Last changes: 21.04.2020
 */
 (function($){
 
@@ -77,7 +77,7 @@ Last changes: 12.01.2019
 					$row.find(settings.handle_move).addClass('dynamicrows-move');
 				});
 
-				var sortable = new Sortable(el, {
+				var sortable_options = {
 					handle: '.dynamicrows-move',
 					draggable: '.dynamicrows-row',
 					onStart: function(event) {
@@ -89,7 +89,14 @@ Last changes: 12.01.2019
 						if (settings.afterMove) { settings.afterMove(event.item); }
 						if (settings.afterAll) { settings.afterAll(event.item); }
 					}
-				});
+				};
+
+				if (typeof Sortable == 'object') {
+					Sortable.init(el, sortable_options);
+				}
+				else if (typeof Sortable == 'function') {
+					new Sortable(el, sortable_options);
+				}
 			}
 			// Plugin jquery-ui
 			else if (jQuery.fn.sortable) {
@@ -267,41 +274,61 @@ Last changes: 12.01.2019
 
 			$inputs.filter('input[type="hidden"]').val('');
 
-			if (copy) return;
-			if (settings.copyValues !== false) return;
-
-			$inputs.each(function() {
-				var $input = $(this);
-				var type = $input.prop('type');
-				switch (type) {
-					case 'color':
-					case 'date':
-					case 'datetime-local':
-					case 'email':
-					case 'month':
-					case 'number':
-					case 'password':
-					case 'range':
-					case 'search':
-					case 'select-one':
-					case 'tel':
-					case 'text':
-					case 'time':
-					case 'url':
-					case 'week':
-						$input.val('');
-						break;
-					case 'select-multiple':
-						$input.find('option').prop('selected', false);
-						break;
-					case 'checkbox':
-					case 'radio':
-						$input.prop('checked', false);
-						break;
-				}
-			});
+			if (!copy || settings.copyValues === false) {
+				$inputs.each(function() {
+					var $input = $(this);
+					var type = $input.prop('type');
+					switch (type) {
+						case 'color':
+						case 'date':
+						case 'datetime-local':
+						case 'email':
+						case 'month':
+						case 'number':
+						case 'password':
+						case 'range':
+						case 'search':
+						case 'select-one':
+						case 'tel':
+						case 'text':
+						case 'time':
+						case 'url':
+						case 'week':
+							$input.val('');
+							break;
+						case 'select-multiple':
+							$input.find('option').prop('selected', false);
+							break;
+						case 'checkbox':
+						case 'radio':
+							$input.prop('checked', false);
+							break;
+					}
+				});
+			}
 		}
 
 	};
 
 }(jQuery));
+
+
+window.Dynamicrows = {
+
+	init: function($el, config) {
+
+		if (typeof $el === 'string') { var $el = $(el); }
+		if (!$el.length) return;
+
+		if (!config) config = {};
+
+		$el.each(function() {
+			var $current = $(this);
+			var data = $current.data();
+			if (!data) data = {};
+			var config_built = $.extend({}, data, config);
+			$current.dynamicrows(config_built);
+		});
+	}
+
+};

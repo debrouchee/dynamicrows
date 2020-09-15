@@ -268,7 +268,8 @@ Last changes: 21.04.2020
 			var root = this;
 
 			$('.disabled', $row).removeClass('disabled');
-
+			
+			// Search for textarea along with the input to clean
 			var $inputs = $row.find(':input, textarea');
 			if (!$inputs.length) return;
 

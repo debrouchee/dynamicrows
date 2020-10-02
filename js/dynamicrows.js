@@ -288,7 +288,6 @@ Last changes: 21.04.2020
 						case 'password':
 						case 'range':
 						case 'search':
-						case 'select-one':
 						case 'tel':
 						case 'text':
 						case 'time':
@@ -296,6 +295,7 @@ Last changes: 21.04.2020
 						case 'week':
 							$input.val('');
 							break;
+						case 'select-one':
 						case 'select-multiple':
 							$input.find('option').prop('selected', false);
 							break;

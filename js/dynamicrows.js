@@ -268,8 +268,9 @@ Last changes: 21.04.2020
 			var root = this;
 
 			$('.disabled', $row).removeClass('disabled');
-
-			var $inputs = $row.find(':input');
+			
+			// Search for textarea along with the input to clean
+			var $inputs = $row.find(':input, textarea');
 			if (!$inputs.length) return;
 
 			$inputs.filter('input[type="hidden"]').val('');
@@ -302,6 +303,9 @@ Last changes: 21.04.2020
 						case 'checkbox':
 						case 'radio':
 							$input.prop('checked', false);
+							break;
+						case 'textarea':
+							$input.val('');
 							break;
 					}
 				});

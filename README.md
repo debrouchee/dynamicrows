@@ -42,7 +42,7 @@ or direct include script:
 <script src="dynamicrows.min.js"></script>
 ```
 
-Markup (example):
+Markup example:
 
 ```html
 <table data-dynamicrows>
@@ -72,9 +72,58 @@ Initialize:
 
 ```javacript
 $(function() {
-  $('[data-dynamicrows]').dynamicrows(options);
+  $('table[data-dynamicrows]').dynamicrows(options);
 });
 ```
+
+Advanced markup example
+
+```html
+<table data-dynamicrows data-increment=".increment" data-row=".row" data-form-prefix="contacts[874]">
+  <thead>
+    <tr>
+      <th>Pos.</th>
+      <th>Firstname</th>
+      <th>Lastname</th>
+      <th>E-Mail</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="row">
+      <td><span class="increment">1</span>.</td>
+      <td><input type="text" name="contacts[874][0][firstname]"></td>
+      <td><input type="text" name="contacts[874][0][lastname]"></td>
+      <td><input type="text" name="contacts[874][0][email]"></td>
+      <td><input type="date" name="contacts[874][0][date]" class="datepicker"></td>
+      <td>
+        <i class="fa fa-minus" data-remove></i>
+        <i class="fa fa-arrows" data-move></i>
+        <i class="fa fa-plus" data-add></i>
+      </td>
+    </tr>
+  </tbody>
+</table>
+```
+
+Initialize:
+
+```javacript
+$(function() {
+  $('table[data-dynamicrows]').dynamicrows({
+    beforeAdd: function($row) {
+      let confirm_result = confirm('Möchten Sie wirklich eine neue Zeile hinzufügen?');
+      if (!confirm_result) {
+        return false;
+      }
+      $row.find('.datepicker)'.datepicker('remove');
+    },
+    afterAdd: function($row) {
+      $row.find('.datepicker)'.datepicker();
+    }
+  });
+});
+```
+
 
 ***
 
@@ -85,13 +134,17 @@ Option                  | Default          | Description
 `row`                   | `tr`             | row selector
 `rows`                  | `tbody`          | rows-container selector
 `minrows`               | `1`              | minimum of rows
-`copyRow`               | `null`           | row selector for template-row
-`copyValues`            | `false`          | if true input-values are copied
+`copy_row`              | `null`           | row selector for template-row
+`copy_values`           | `false`          | if true input-values are copied
 `increment`             | `null`           | selector for placing row numbering
 `handle_add`            | `[data-add]`     | selector for adding new row
 `handle_remove`         | `[data-remove]`  | selector for removing row
 `handle_move`           | `[data-move]`    | selector for moving row
-`index_start`           | `0`              | starting index for input-arrays
+`index_start`           | `0`              | starting index for input array names
+`form_prefix`           | ``               | prefix of input-elements to be ignored in updateFormNames()
+`prevent_renaming`      | `false`          | prevent auto-renaming of input-elements
+`animation`             | `false`          | use jQuery animation method (fade)
+`animation_speed`       | `300`            | animation speed in milliseconds
 `beforeAdd`             | `null`           | callback function
 `beforeRemove`          | `null`           | callback function
 `beforeFormUpdateNames` | `null`           | callback function
@@ -102,22 +155,5 @@ Option                  | Default          | Description
 `afterMove`             | `null`           | callback function
 `afterFormUpdateNames`  | `null`           | callback function
 `afterAll`              | `null`           | callback function
-`animation`             | `null`           | jQuery animation method (fade)
-`animation_speed`       | `null`           | animation speed in milliseconds
 
 ***
-
-### Example for callback-usage
-
-```javacript
-$(function() {
-  $('[data-dynamicrows]').dynamicrows({
-    beforeAdd: function($row) {
-      $row.find('.datepicker)'.datepicker('remove');
-    },
-    afterAdd: function($row) {
-      $row.find('.datepicker)'.datepicker();
-    }
-  });
-});
-```

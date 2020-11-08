@@ -115,10 +115,10 @@ $(function() {
       if (!confirm_result) {
         return false;
       }
-      $row.find('.datepicker)'.datepicker('remove');
+      $row.find('.datepicker').datepicker('remove');
     },
     afterAdd: function($row) {
-      $row.find('.datepicker)'.datepicker();
+      $row.find('.datepicker').datepicker();
     }
   });
 });

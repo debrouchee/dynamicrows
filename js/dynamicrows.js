@@ -251,7 +251,7 @@ Last changes: 06.10.2020
                 current_index++;
                 $row.find(':input').each(function(){
                     $(this).attr('name', function(i, name) {
-                        if (name === 'undefined') return true;
+                        if (!name) return true;
                         if (settings.form_prefix) {
                             name = name.substr( settings.form_prefix.length );
                             name = 'TMP' + name;
